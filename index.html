@@ -1355,185 +1355,155 @@
         }
       }
 
-      /* ---------- downloads v2: resource card grid ---------- */
-      .dlcard-grid {
+      /* ---------- downloads v2 — resource card grid ---------- */
+      @keyframes dlCardIn {
+        from { opacity: 0; transform: translateY(18px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .dl-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+        grid-template-columns: repeat(3, 1fr);
         gap: 16px;
         align-items: start;
       }
-      .dlcard {
-        display: flex;
+      @media (max-width: 900px) { .dl-grid { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 560px) { .dl-grid { grid-template-columns: 1fr; } }
+
+      .dl-card {
         border: 1px solid var(--line);
         border-radius: var(--r);
         background: var(--bg);
         overflow: hidden;
-        transition:
-          border-color 0.22s ease,
-          box-shadow 0.22s ease;
-        position: relative;
+        transition: border-color .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s cubic-bezier(.2,.8,.2,1);
+        animation: dlCardIn .55s cubic-bezier(.22,1,.36,1) both;
       }
-      .dlcard:hover {
+      .dl-card:hover:not(.is-open) { border-color: var(--maroon); box-shadow: var(--shadow-md); }
+      .dl-card.is-open {
         border-color: var(--maroon);
-        box-shadow: var(--shadow-md);
+        box-shadow: 0 14px 48px -14px rgba(154,42,46,.26);
+        grid-column: 1 / -1;
       }
-      .dlcard.dlcard-active {
-        border-color: var(--maroon);
-        background: var(--maroon-tint2);
+
+      .dl-row { display: flex; }
+      .dl-body { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 16px 14px 0 16px; gap: 12px; }
+      .dl-info-row { display: flex; align-items: flex-start; gap: 12px; }
+      .dl-icon-sq {
+        flex: none; width: 38px; height: 38px; border-radius: 9px;
+        background: var(--maroon-tint); color: var(--maroon);
+        display: flex; align-items: center; justify-content: center;
       }
-      .dlcard-body {
-        flex: 1;
-        padding: 16px 12px 14px 16px;
-        min-width: 0;
-        display: flex;
-        flex-direction: column;
+      .dl-icon-sq svg { width: 19px; height: 19px; stroke-width: 1.7; }
+      .dl-info-text { min-width: 0; flex: 1; }
+      .dl-title { font-size: .96rem; font-weight: 700; color: var(--ink); line-height: 1.3; margin-bottom: 4px; }
+      .dl-meta { display: flex; align-items: center; gap: 7px; }
+      .dl-pill {
+        font-size: .67rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+        background: var(--bg-alt); border: 1px solid var(--line); border-radius: 4px;
+        padding: 2px 7px; color: var(--body);
       }
-      .dlcard-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        background: var(--maroon-tint);
-        color: var(--maroon);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 10px;
-        flex: none;
+      .dl-desc { font-size: .86rem; color: var(--body); line-height: 1.5; display: none; padding-bottom: 14px; }
+      .dl-card.is-open .dl-desc { display: block; }
+
+      /* thumbnail */
+      .dl-thumb {
+        position: relative; display: block; height: 114px; width: 100%;
+        background: var(--bg); border: 0; border-top: 1px solid var(--line-soft);
+        cursor: pointer; overflow: hidden; padding: 0; transition: background .22s ease;
       }
-      .dlcard.dlcard-active .dlcard-icon {
-        background: var(--maroon);
-        color: #fff;
+      .dl-thumb:hover { background: var(--maroon-tint2); }
+      .dl-thumb-frame {
+        pointer-events: none; position: absolute; top: 0; left: 0;
+        width: 400%; height: 600px; transform: scale(.25); transform-origin: top left; border: 0;
       }
-      .dlcard-icon svg {
-        width: 20px;
-        height: 20px;
+      .dl-thumb-veil {
+        position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(255,255,255,.5) 0%, rgba(255,255,255,.1) 55%, transparent 100%);
+        transition: background .22s ease;
       }
-      .dlcard-title {
-        font-size: 0.98rem;
-        font-weight: 700;
-        color: var(--ink);
-        line-height: 1.3;
-        margin-bottom: 3px;
+      .dl-thumb:hover .dl-thumb-veil { background: linear-gradient(to top, rgba(154,42,46,.1) 0%, transparent 65%); }
+      .dl-thumb-eye {
+        position: absolute; bottom: 8px; right: 8px; width: 27px; height: 27px;
+        background: var(--maroon); color: #fff; border-radius: 7px;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 2px 8px rgba(154,42,46,.35);
       }
-      .dlcard-meta {
-        font-size: 0.8rem;
-        color: var(--muted);
-        margin-bottom: 10px;
+      .dl-thumb-eye svg { width: 13px; height: 13px; }
+      .dl-card.is-open .dl-thumb { display: none; }
+
+      /* right action strip */
+      .dl-strip {
+        display: flex; flex-direction: column;
+        border-left: 1px solid var(--line-soft); background: var(--bg-alt);
+        flex: none; width: 44px;
       }
-      .dlcard-desc {
-        font-size: 0.86rem;
-        color: var(--body);
-        line-height: 1.5;
-        margin-bottom: auto;
-        padding-bottom: 12px;
+      .dl-act {
+        width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center;
+        border: 0; border-bottom: 1px solid var(--line-soft); background: transparent;
+        cursor: pointer; color: var(--muted); font-family: inherit;
+        transition: background .18s ease, color .18s ease; text-decoration: none; padding: 0;
       }
-      .dlcard-foot {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        flex-wrap: wrap;
-        margin-top: 8px;
+      .dl-act:last-child { border-bottom: 0; flex: 1; height: auto; min-height: 44px; }
+      .dl-act:hover, .dl-act.active { background: var(--maroon-tint); color: var(--maroon); }
+      .dl-act.dl-act-dl { background: var(--maroon); color: #fff; }
+      .dl-act.dl-act-dl:hover { background: var(--maroon-dark); color: #fff; }
+      .dl-act.done { color: var(--maroon); background: var(--maroon-tint); }
+      .dl-act svg { width: 15px; height: 15px; pointer-events: none; flex: none; }
+
+      /* expand panel — grid-rows 0→1fr animation */
+      .dl-expand {
+        display: grid; grid-template-rows: 0fr; opacity: 0;
+        transition: grid-template-rows .52s cubic-bezier(.2,.8,.2,1), opacity .3s ease;
       }
-      .dlcard-pill {
-        font-size: 0.7rem;
-        font-weight: 700;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        background: var(--bg-alt);
-        border: 1px solid var(--line);
-        border-radius: 4px;
-        padding: 2px 6px;
-        color: var(--body);
+      .dl-expand.open { grid-template-rows: 1fr; opacity: 1; }
+      .dl-expand-inner { overflow: hidden; }
+      .dl-expand-body { border-top: 1px solid var(--line-soft); background: var(--bg-alt); padding: 18px 20px 22px; }
+      .dl-expand-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+      .dl-expand-label { font-size: .69rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--maroon); }
+      .dl-expand-acts { display: flex; align-items: center; gap: 8px; }
+      .dl-expand-btn {
+        display: inline-flex; align-items: center; gap: 6px; font-family: inherit;
+        font-size: .74rem; font-weight: 700; border: 1px solid var(--line); background: var(--bg);
+        color: var(--ink); border-radius: 6px; padding: 5px 10px; cursor: pointer;
+        transition: border-color .18s, color .18s;
       }
-      .dlcard-size {
-        font-size: 0.8rem;
-        color: var(--muted);
+      .dl-expand-btn:hover { border-color: var(--maroon); color: var(--maroon); }
+      .dl-expand-btn svg, .dl-expand-close svg { width: 12px; height: 12px; }
+      .dl-expand-close {
+        width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+        border: 1px solid var(--line); background: var(--bg); border-radius: 6px;
+        cursor: pointer; color: var(--muted); transition: border-color .18s, color .18s; padding: 0; font-family: inherit;
       }
-      .dlcard-badge {
-        font-size: 0.7rem;
-        font-weight: 700;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: var(--maroon);
-        background: var(--maroon-tint);
-        border-radius: 4px;
-        padding: 2px 6px;
+      .dl-expand-close:hover { border-color: var(--maroon); color: var(--maroon); }
+      .dl-viewer-wrap {
+        background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+        overflow: hidden; box-shadow: 0 20px 60px -25px rgba(27,27,29,.28);
+        max-width: 860px; margin: 0 auto;
       }
-      .dlcard-acts {
-        display: flex;
-        flex-direction: column;
-        width: 42px;
-        flex: none;
-        border-left: 1px solid var(--line);
-        background: var(--bg);
+      .dl-viewer-iframe { width: 100%; height: 70vh; min-height: 520px; border: 0; display: block; background: #fff; }
+      @media (max-width: 560px) { .dl-viewer-iframe { height: 55vh; min-height: 340px; } }
+
+      /* fullscreen overlay */
+      .dl-fs {
+        display: none; position: fixed; inset: 0; z-index: 200;
+        flex-direction: column; background: rgba(22,22,24,.88); backdrop-filter: blur(5px);
       }
-      .dlcard.dlcard-active .dlcard-acts {
-        background: transparent;
+      .dl-fs.open { display: flex; }
+      .dl-fs-bar {
+        display: flex; align-items: center; gap: 14px; padding: 13px 18px;
+        border-bottom: 1px solid rgba(255,255,255,.09); flex: none;
       }
-      .dlcard-act {
-        width: 42px;
-        height: 42px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: var(--muted);
-        font-family: inherit;
-        transition:
-          color 0.18s,
-          background 0.18s;
-        text-decoration: none;
-        flex: none;
+      .dl-fs-info { flex: 1; min-width: 0; }
+      .dl-fs-eyebrow { font-size: .64rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-bottom: 2px; }
+      .dl-fs-title { font-size: 1rem; font-weight: 700; color: #fff; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .dl-fs-close {
+        width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+        border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.07);
+        border-radius: 7px; color: #fff; cursor: pointer; transition: background .18s; font-family: inherit; padding: 0;
       }
-      .dlcard-act:hover {
-        color: var(--maroon);
-        background: var(--maroon-tint2);
-      }
-      .dlcard-act svg {
-        width: 15px;
-        height: 15px;
-        pointer-events: none;
-      }
-      .dlcard-dl {
-        background: var(--maroon);
-        color: #fff;
-        margin: auto 0;
-      }
-      .dlcard-dl:hover {
-        background: var(--maroon-dark);
-        color: #fff;
-      }
-      .dlcard-preview-panel {
-        display: none;
-        border-top: 1px solid var(--line);
-        background: var(--bg-alt);
-        overflow: hidden;
-      }
-      .dlcard-preview-panel.open {
-        display: block;
-      }
-      .dlcard-preview-panel iframe {
-        width: 100%;
-        height: 420px;
-        border: 0;
-        display: block;
-        background: #fff;
-      }
-      .dlcard-preview-panel .fprev-empty {
-        padding: 20px;
-        font-size: 0.88rem;
-        color: var(--muted);
-      }
-      @media (max-width: 560px) {
-        .dlcard-grid {
-          grid-template-columns: 1fr;
-        }
-        .dlcard-preview-panel iframe {
-          height: 300px;
-        }
-      }
+      .dl-fs-close:hover { background: rgba(255,255,255,.18); }
+      .dl-fs-close svg { width: 18px; height: 18px; }
+      .dl-fs-body { flex: 1; padding: 14px; overflow: hidden; }
+      .dl-fs-body iframe { width: 100%; height: 100%; border: 0; background: #fff; display: block; border-radius: 4px; box-shadow: 0 32px 80px -20px rgba(0,0,0,.6); }
 
       /* ---------- contact cards ---------- */
       .ccard {
@@ -3501,7 +3471,23 @@
       </div>
     </footer>
 
-    <!-- ⌘K jump search palette -->
+    <!-- downloads fullscreen overlay -->
+<div class="dl-fs" id="dlFs" onclick="if(event.target===this)dlCloseFs()">
+  <div class="dl-fs-bar">
+    <div class="dl-fs-info">
+      <div class="dl-fs-eyebrow" id="dlFsMeta"></div>
+      <div class="dl-fs-title" id="dlFsTitle"></div>
+    </div>
+    <button class="dl-fs-close" onclick="dlCloseFs()" aria-label="Close fullscreen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="dl-fs-body">
+    <iframe id="dlFsIframe" src="" title="Fullscreen file preview"></iframe>
+  </div>
+</div>
+
+<!-- ⌘K jump search palette -->
     <div
       class="palette-scrim"
       id="paletteScrim"
@@ -3624,14 +3610,14 @@
         filename,
         href,
       });
-      const FCARD = (label, note, filename, href, kind, opts) => ({
+      const FCARD = (label, note, filename, href, kind, opts = {}) => ({
         t: "fcard",
         label,
         note,
         filename,
         href,
         kind,
-        ...(opts || {}),
+        ...opts,
       });
       const DL_FILLED =
         "data:application/pdf;base64,JVBERi0xLjQKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUiAvRjMgNCAwIFIgL0Y0IDUgMCBSCj4+CmVuZG9iagoyIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GMSAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL0Jhc2VGb250IC9IZWx2ZXRpY2EtQm9sZCAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjIgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iago0IDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhLUJvbGRPYmxpcXVlIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GMyAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjUgMCBvYmoKPDwKL0Jhc2VGb250IC9IZWx2ZXRpY2EtT2JsaXF1ZSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjQgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iago2IDAgb2JqCjw8Ci9Db250ZW50cyAxMSAwIFIgL01lZGlhQm94IFsgMCAwIDYxMiA3OTIgXSAvUGFyZW50IDEwIDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9Db250ZW50cyAxMiAwIFIgL01lZGlhQm94IFsgMCAwIDYxMiA3OTIgXSAvUGFyZW50IDEwIDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago4IDAgb2JqCjw8Ci9QYWdlTW9kZSAvVXNlTm9uZSAvUGFnZXMgMTAgMCBSIC9UeXBlIC9DYXRhbG9nCj4+CmVuZG9iago5IDAgb2JqCjw8Ci9BdXRob3IgKGFub255bW91cykgL0NyZWF0aW9uRGF0ZSAoRDoyMDI2MDYyNDE3NTgxNSswMCcwMCcpIC9DcmVhdG9yIChhbm9ueW1vdXMpIC9LZXl3b3JkcyAoKSAvTW9kRGF0ZSAoRDoyMDI2MDYyNDE3NTgxNSswMCcwMCcpIC9Qcm9kdWNlciAoUmVwb3J0TGFiIFBERiBMaWJyYXJ5IC0gXChvcGVuc291cmNlXCkpIAogIC9TdWJqZWN0ICh1bnNwZWNpZmllZCkgL1RpdGxlICh1bnRpdGxlZCkgL1RyYXBwZWQgL0ZhbHNlCj4+CmVuZG9iagoxMCAwIG9iago8PAovQ291bnQgMiAvS2lkcyBbIDYgMCBSIDcgMCBSIF0gL1R5cGUgL1BhZ2VzCj4+CmVuZG9iagoxMSAwIG9iago8PAovRmlsdGVyIFsgL0FTQ0lJODVEZWNvZGUgL0ZsYXRlRGVjb2RlIF0gL0xlbmd0aCAzNzYyCj4+CnN0cmVhbQpHYXUwRj5CPzkpKUxdcjhwbiI/PC5bdTVVbyNrIyFHXD1NKmZ1Xzc6OWwzbjFbVF1VVSZIZi5QXmwmLWlUJ2NmOUFLKWxRWW5RRilvSnRhYnAhRD5KYE5RRURgWW0xYypJW15QOXQhRTU5PHBfKFVVcUpWXjNhTEheLCxAc1o1Z3AoNDBuMnEkQ200PWw8Ui9mS0NfRVpDPFpnY1ZjSUAtODVAPyJoaDt1bFRwXlg1PHU8PzVEOmJsJV5tW18wM050Z11iMzQ4YWsuZkAjJiVcN1tCO3R1Sz0tKTlEXzonIm9SNUoiIkkqN0I9I1pqLEFcYTBgNlxiXydrP1E0UzZfdCJPLW5EKmRKNmFadTFwayRKSkFcXGlrWUVQSW0jQ0kmYm8tM2slL3JXNWI8SSVMMVc4UjRpTSlpUDE5Vy5hQEw2a09oX29vSm0uczFrdGdOKSlqbic6a05rUCs1JG1QckRSTDloJk1vTSpEUnFOQS5za1EmSHVwXVphRnI7LTpQK0RrPU00LmJPcGpAakRBI1phK1pQYzY7YCNRLFBLJURVUnBFaXE8NmtZQFcjaG85RlQ7UyNScElZIzc9OGsvaFVxIj9eRzNCOyEjX04kdCszS1hLMjdoKms+ZDkya0ZxQ0Y1cDFKSm8zZnE/NyJGME5NNSVtUnFaU0FySGZpKmhba0h0IkJUL2tGWlJgOkFOWj5ROGckMlkqY1BMYFg9REJYMj9KTGNQNUFLZ0RNWkhJMypfLEwsZD4/YSRTRF0yaUhVSU1WYTJtSD5YMmdPdGhvLkc0KFZxWFhdUVlbSU9APCpVPlo4MmRlPllOMjlaKklyXjtkbnNlKE5NQ1xoXCluKTEmMlEyPDEuLl1QOkIiN3U8IUNmaGFoVW4vTU1paF9lUWpdNyk4V1lWIUg8SmMrKFQ3bi9yIzUzNmM7RldbRFJaMFdVKWZOY2EuRzc0PWxYbDQlcCtMb1lDYScndEU6NDZZQVZXJUk8YCg3X1dJMmonY1RnSVtEJilsW2VgK1ciN2ojPTphOUclVEM6QUlCWklTZyNIQVxGMXFOKzIvTFZFbFwvQzcjLWIkSGk/OWBrJ10zNFJbQEIvSGJcIS5bb1ZTMU5vR0RrPiskQFwtODw1TjdsKF9ZU0E3aEQoSyRbUHA/YGFHOlw9cUZxXChwNyklKEdBUGpsP1M3Y1Q3Y0ZMXUwhNyUndSFMQy5GVC5GQmBUPzZDLjZPaDRVVzooQE5qYyldLSxxLGNEPC1SQXFzUEVqJXBTQmRIM1VUc191OjxnQE9EKyZGMEddN1k4NixITSMkOD4nNE1sNlNqNDVCLnBlNFFSSEBrKEY1JWpvVXQ/S3RiSio3dWZHX2FTKjBjY1laa1dGQDVERyxxNmAuIy4jX1kiYVpEYltWSi9oazZwOTY5LC1mZ1QiRSFLLGEtMW9cckxXKlkhS0IxMkZMImlJRkwtPFw3Vi9pOFs3Q2pbNGpXQE1ScEdGK21DTGFWWWhnWCRlQiZePSkzWUxjQHJjWFtZSlNQXyxEQGRpc2pgQUxbTGhdVzRlbGJpPXBKQWNrdDtNOWUhLVFYPGErb2JCZDU4MGheYkBOKFNxaUZHYDxYRFZcb0ojJSIiWl1WJiYjSHVLI14vanJQVUJPMyJMVSotJUtcXzdXJitSUWQ3L0RNVyZEUytMQSpgQkNjSy5GPEFrNm5RPjA/P0IoUC5XOClsbjxYYF0lZSU+TTJeQy9GMXI+ajFuXmQjUElzRiVdWjI/aWhsPl85TklqM0NlTjVIV0k+WTolcFBibExKdGhWXl42UWtlP0U1RSRPOj9yT1oybHVrZ1Ulc1htNGI+I2s8SEpeMV1RcyQoVTZYbEFLbkAjP2U+U0FIJWRCVDAkNUdMbDxGJDo5MmhGY0M4OmA1Q2FpbGlOXSUzKTxDQUs5RSJvLDYzYGNyMjIhP1xEQDFYSVlFT0dUTyU4ZS5ZWCw3XHM2Ky4nMzVrXiFgOCFjVi5XaFE8Yk5gKmUxTi1SbS9xLGlVYlYpJFQ0YVk0PGxlO2RDaFc2LW5iLTkncy9bQl1PNCpGbEkyVUZyVXNVLmFPXEBdZ0UtP0U1bUFtQ0ppL2NjKU9ATD5TKGlpUDlLIit0Tytbcm5vamYzQV1OXiQxL18+JkdtRmBLLC4sYGIpKyZaYD41ODNNYS9aKDVEQDNZUG9kaDJCPyRiRk5Aa0NrJ0g7ZTZcV1dKSiNjJkk5XUorZk9rI2FIRFlgYF9nJC5MLXIjJENwdEFNIyNeYkZOYldQSzoyTGBeIVRMY1M4bHBPS1lbSmEpbU1NUkslbGldKypENC8vSVJWWEwkVjVyKFBfOUsibT9FQ2tsR1ZIUkNqJUZkMFs3JGk5a1otTT0mal90Uk1GODY+STRxXkB1XS9WTm5yRzVndCE5LU5tZlUwXGRMKyQ2LjRvL0s9InJYMm0/VD90JilXa0MkZys1ZWlPSkp1O3Rucj9YRF0hVnNCcTtXW28kTHMtUDoialhgVGonKkVRJmUrbjdJVzUjZEooUFVgODthLio2UTxfJyRnNFo+cSw2bzxVciskPVZIM0YuSSRfc01fZGdwV1gyMkBCSVczQ09sXnItVjt0MiI3UzdpMyM+KiUiWWA0bjZeXmNOaixATU4/Zm10LmgtLSpqMTtSLUJkODRubnFENTpcSUcqJXEuJC84Im0wJ2xHNWRLSzpgLio1M28pUGVYLDw+IyhcVWNEa2pOcT5KOU5WPCcsZFdcXFgqJVdBW2ErQ0k0NSxvQSdcVGpnWlVBIjVRLmFqKmllaj89OStyX0FxKTYtWmxsLiNaKlhXIStHYkVfLHJlOjdfTi91ZyRFWylEJihMaiE9QlVgXTEzaHNhbTFncy0xaE1iVSYsWyRAUlZxIUpCNTwtM2dXbWJqZVJtcjhQU0dlPk9MYEhZMVNoSE9ZYURcYjVvZE0hNWdjWGFGOSQlOF4sbilwXy88UnQ+aGI+UnNYXGxHOldhTlNcXilrWmVrYC9DQScnUFU4TGwnVTdJMiNCX2BiKS9QKDVkUD9uKXVwWyRqbVdTWTckTlxIIzU2KShVQXNWOVJiIUkjOCQrQydocD5WMj1oIiwmLV5RUiFlT0hSKScicltlcVdnRyllWyQ5LFxfP24ycFBlZTwkLSl0OGoyXW0yJGVjPGYoVDo/W2ZESnJSWCspNyhFWzs0ITw0P3BmY1VTM01MTD8pNjVwYCdTTztYWCtjT0tBN2hlci1OTGdVcEFgS0ZkPV9EZ04uKjhOW3I7V1hLKzIxMGc9Uz9lbD4lWGRtcEh0Zy1tMDAyQipIJEYlOmghU2FHXjdBX0QqdWtYKihCb0YmPCUyViFAajBBUC8xJ0tEWSNWUmo/J1otXFdbYz5EVUpaPEZKYCNuQGJlOUptPFVsXCMjbzliLVYrKW1WMWx0KiM6UjVpcV1OSFNlLiNrWlFYRT1SUmpETGsxVyUuK1cmbmw+RjA8OjFwQlRvYG0jcCoiXE88JUBfRyI0IXU6Jz03TCItcyImazYmdC1RSldYYmxdamdYLV9FWyZhRXMvJj0iXDFiJjtWTUYuUFlmRiNmKy42aSZcdScsKEpfUF1ubW4yZUk7WFhfcCUmUlJGXSM7IzlaWkgmVVlUPGlKZFxjVmRkUSlcX1tnY1tRbEVhUldXRlpDalcwaUZEIVlcXVNVK2lWWDRoTURkO0QhNmQ+RCUuTllLKiltNCosKVNOK2NMIypab1c5LTU2N1owYFNNTjBcNi9mSTZzMlBSR1k0JU0yZ0tQYStlI0JsMkIqIXRBVWBYXz5YZDVWV0Unb2E2ZDYpJj9FQ2EwaVtZXyxAKDhEJEJnRyUkRkVOSEs/WEpTT1E0VGc+XitMIUg1TEk3ZzFzQSRmP1dVVGdfPkRsWGk1RTdTIixqIy8jOVs1RTA4Pz9GKWFvcy5oJTZlKTghSCVpYjYtX1JEVTtQVF0rcSRSKUFWOnJXQF1xVz1QUz5JLGZkPltiW0FpZTFJaGo5MmI3NU9TLEJbImhKVUFwJzE0Zzs8UU5zYjpnTE4lKDtTKD9hNmspQWc/aVFbVi1yV1ZUN3AkQ2dMWkhtOW5ZTDcwJy8tSFhRbTM4VSQ7UlU6LiotdVpXLE1IKz9WTmxgb0xxMDQrTDdqPE9vR1llblJpTkhFZW1jJC1KWSY1IlpMLC1LUHVjN08xIUhwOS8zTzU/QyVlV1leI2drNyVvJGd0OldnUT5LbFhpZzYsUEBNLipqVy0kXTpEP2NDSiZsRkQ4byoxUydIQ21hOyNILDwxYj8hZDRGU1M9RCVnKzFRdGI/RTsybmlNLkYxREtGRTorPUNJZTQ4JjFVSTwpV00tRz0+SVlqJzdHPFFuLmNXcGBCSGNXUDc0WChSNjwzXSNaLmApQFxcOStiNlpwK2UzN2BEUyhZVis9T2llTjZ1TSlibyMuYCx1S0QvXjVVYiFyTjAqOzolRWQ1dERiIWklUzwoZEprW0NPYmlPRiE/QWM1V3BgYVIicWkuVmVAKmswMmpOVVZVKWo/OyxTJEVdLEUqUT5BRy8oN29NWT9NV1koNFEyJmdzR01jK0BmMSVeQCg8U0ZUIVxEJ2hccEtjY044aEtwOFRlVUQhUEw1TmheMEBiWUBcS0ZpWyllSUlYbSEwWTw0ZTJBWTEhKl1kaUkjJ2ElJD1nNV88b20wPk9NWC5BV0FVV1pVbF9BXVkzb1hOPWA0KWozZSRPZjJlPzlPSztIUmRHKGg5K0RWcWRePldCNFBdP2RBdWk2T0YtQU1mPUtLMVA2ZiRTMkVyQTB1LT9PbE5yJkQlVj9iNiIkQDJsIV89LklXZTwjLm5nPFVMPSxSYVZvMVY6dFUmP1s+XF8pLmdEMm82NS5jV0doW0BBYSVKaGhJMiVuQ2hzImpBNFdWSEUqJipLZnUvR15PWTdwI2JCJ3BOXlRBVSNJXFEhXk08Z2NRSSlLU1RTNFMsVm5WXCkzYWcxP09kKEI7W01jLz9Hfj5lbmRzdHJlYW0KZW5kb2JqCjEyIDAgb2JqCjw8Ci9GaWx0ZXIgWyAvQVNDSUk4NURlY29kZSAvRmxhdGVEZWNvZGUgXSAvTGVuZ3RoIDI4NDIKPj4Kc3RyZWFtCkdhdTBFPyQiYzMmVWkhL2ZWZElsWzsjMCNvXDROUkY/OEdVaDpPTi1tWWtLcSZlWidcS0YzZyxlUi4zPko9bj1EVklfMjg6ODNPZEhQWDN1XTZiKSpWWUszOl5VIzYlZU5JL2JGMkBQLUlMXjhSIkU4aG1mQ3RvLTM6dFk3ImlwNF5yImg+MVBYSmdkRXEtKzVobyJYOkU5YTUyXDVPYjBJbjouQWFrMkxpYkNgYl1kMk44czA+IWNWNjAoXVFabEQoXDNqYVJkOXU0VFtyRDBxcUZBSiYjZkBMZCktW0tKTTlWIVguKC01Y3IvVVpaJl9yXFtpajZMJ1ZzKE5LQSlicnAoZDsvSFhMRDBiRVk/My4pJmhzTiI3OU9dPmtPNzhTNXNjW2NAT0BEYVtQIiRZLW5fLjdOJ2smQmt1PkU1clVNKmhJXnM/Z1YnMUJYM2hEc3NfbVROXHEuJGdgSGQ3cHJfY2I4MnIjdCxHZ2ZDTFdfaVEvJjFlaEJQIionOyY1UTpIYkpfLD4sXXRmSTtuRjAnYGokLDQuSlBRM3BBQyJgcicoUnUwL1dSUD9FVTlNW2UrWjldPFIqTWwwKzpJcFJkdTtCX0gvJ0UzZHB0PldlQTwrVS0/QlkpUz8+QzVlXkIuT2s9Qy9IVFNyYmFjNz84clJfRW06a3N0NW1Xb0hMNTopNClrI2FdLXErbzBgYjI2TEJsQz50JD8sIkQ5MFFfYlYhMTAzIkM4aDAqLnNKWlNgWGQiKyUzTnRaMmw5PlwhcD5UOyMoYmdHLV9obT9OS2wpcTJoaTVaZUdZUy5BJDw1RTdKNFx0UEwrPGVQPlA4blphKiIvN1NuXmRRRCsoUWVBMWA9LnBMTUIlK1U3VXBMSC9jSWFENk5VLi9YazYwdU9mVUxKWS9wSktVMHFgNzlGTm43QCoxai9fMFsvQGs+QCZDLCxiOVYmREJOVGJ1MUckNmRYKi9ZQDJGZFZ0cCxtLyY6Nk9nKyxRVFtNWixqVXNoJVJkZXFuUlVNTC5BRiZjcjxKPlFaIyJgNGk+RlUvMk9lTz0iPkY1cF5NKzVGSSRMLWJQZ1NlTmloITA4QicmRjNpJFgoS3I/c15VaEVoK0xhP0QsRGlqbXJqRDAjMFlcMF9mOUtbPG9KQ1c7TWc9XThuMic/WUxbTD1zQzIlTFBcMUZDdUJIUSJfNScuOGY2XE4xUSJcSS9TRTxddTZvJFdFXmUyVElHSz9zTyY6M0Npc2w/O2ZUbFEkSikuRVROYjtgbW8oYS49RGNxMjNaWiJrQElyISFgc0lNam5URidNJlIhPWF1XF05PzUjLjZBVS5FM2BeZ1o6ZUFUQnVAJUs/RyJBdCw9KUE6Z19aSFxoPUBSdEJwTkBIXm1hUjohaThhSl00WVRVZjNqb3RYSihIQk5BaWVZcl4zVyg9MHBxXFozJygtKzNjR2RAUXE8RSUuNnR1X0k0VF5oRk9IPy1YUz8oJVo3IWBBaDt1ZVopMW0xMFZARScidSllLCdGZnIhPmo1JnQ+dEwra0FbNUYiKTk4VjAnJkZAaVVYLTddUStgVTRJYFpfLmxbM05fP1Q9ITtpVidBR2praklFRF1MOk00MCJaJj1ZUic9Rl0hU0thVSxEPGpVMGQmbURtYUlsQURzNVIqclwsNWZeL2VPa1pITlpFM1kral1HVV4jTj5zLzReb2BtRjlpU1NzYml0LUQoJiRAWmpZJVNLXzJOWWJXJ0ZQbjMlNjZEQ1BTZi5qPXM+S0gmYGdsNWFnRXJbTjJWbCxgIiolaTw/NGJdZEc7bmo5dC1QXGJFYUtANFpbKzpRWWBlbmwzZTJESi5qbXUtOyFCUiMkaUNmKUNLOiw+ZDI1Tm5vKVsmY1QnNUI+XE9gIkIoRyk0VT9MbSpULGxuMjw5aykvTWlIWz9ndGM9ZTU2RTclMUVDIz1IRFlEaDcvZDZEQVlKMi1KWmtmZl0uTVdzVFUvbVw/QENVZSYuPGE3Tlc7JklLVC9QcF8uXklNKUlsVEQ0RW9eZWhtM19ubjQlUEc9cGJUPWBfUEhSTzRDXldVYz9BVFdVNCNcKVIpIWA0NTYndEghKyxpZzg7ZFRQIV4qZDNfJC1iLm0paGYuOnUocFAuN3JzSmAuaSsna1g5KDtIJEBFMFE0OlgmRyZmImBdP0svVzNuRTNlJilrWF1CQDI8bFdtUnUqTkk9RzFUMW0hJ04tckBtTT5ma2ciJCNmVUBkczpOSl9HcG9ZazI+XCVMIy9sRShdUl1zLT10J0RUbDYsTSkpSyhVZ3FrQFotLTZGPSpVPEsnSWQlOmVvMlIvLGU8aSxGSSRkMUkvIlpubmdhIlEpWV8wMGpzXk5UKlpRJm9BK0NwLVhcJFpiOT05Yz9fYHEpMFFuWShRPmEoYWY/MyIpKVM0LCxpUCllISRXaDFKbTB0bFcjajlNIT9gMEMyMFhcZ3RPaSFNZVQ2TV82azpmVCIwSzw7dFQqVDUvbylTSixsJE9cVmVdbjlMSz0oNixZWjxqcz9rM21yVm5yKWxHbFcyUUg5TXFsYjMmZmw2MVhoPj1LQSdMWVRNPD5Bb210UnEpZyZyI0tjLmpXckFCKTEoVG5WUyYydE1sSzZdVWtLamFASjliM1lzMGpTZDdwRCteSm5MLy1BVVMvNCtbS0UoR3NoLUBraFJzIictXmpIJDFqVTVmI0FITEtrOmdvMm5NQnBbOCs+OWktNUhPLnFvOXInQyUhQ1JyaDBVMDlsJy4tLF8kSEAjYzZDPFlhKCUzXCg9UkBfWFJnIiZwJ10nVk8zWScqJkQ1bjNaIjIkSzJ1I1ooNiFOZElNM2lxLUIvLWpZNnMtLXApKypISClAMChEcyxoNTJWYEQ8VFRzIkNJMGIzOFs5J1RiLSdrPi0qJkwzMi9eI0dyZUNoTlNIMjcnWGdIX2c6VFVZTVhRIWxdKy9SMzgkRDAtV241IlVtKD4xR1EzcGU4cEpTK21JbGFcWyVYRG8nNGRITSdCYGErKkYsRGc1ajFXbEFDRkwuVWZZZ1tTOGBec1gzJGclSy1MO0VoTFo2PiYjMUEpRzNrOS86Ul1yUlwjTTxxOExnPkBaISlpZDhXUitnWksmYkhLO3FdQUxea3VkUjghVGt1ViwwSmlzWCFyR2s0UUBoZFxqST5iJU9lPFxYPlJ1YkRFY1BccjMxKHNAJUltZmRGZXNEJj1WJiFVb1BJKW46YFxWV15uUW0lXl1sUVg9ZkFySjwnKyE5NktJa2dXInBAJm9SSjIta21Ma1tdIkooSTAmRmBtMl44OjhJJll1LG5sUWpMJTlnUFtdKz5EZm9EMF8xaSU+OllcTyFlOFJrW1BTUUdNNEM3Y0NeVWVLcUc6ZipxJFk0SC46aVBzVylbdU0jc0ZmPkYkMDwmT1xMPWlyMi88SVZdKFJwRl41Y285M2NIR1BbKFQrMiFAMk9nZVluaC1BOC4vXytrIyphV2hVc0JBUVlLWVFgTiMrOW5SMWZdaEZSWEU0PDNfVSQhXz09NjVtOTNuckFFUTk7NSVkYmVkQ1FCLVMzSFgnIz02RlItSClJUmomPD5PLGgsYTZARipJPz9fRyZMPFx0aydWcFxPOkRONlddT19aPlBeRS8iOVZpcjkoLlBdSy5dRm5CJkN0U1twWF4uYFBRTUFtaEtkKyZOSEMwKlI8M25PO01sP00pRkkqSVhdb0luK2Q+Z1dEPFB0VDMoZSY/YjhUaT9XNW1wajJ0Zi9pNyVdLGNMNTFjfj5lbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCAxMwowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwNjEgMDAwMDAgbiAKMDAwMDAwMDEyMiAwMDAwMCBuIAowMDAwMDAwMjI5IDAwMDAwIG4gCjAwMDAwMDAzNDEgMDAwMDAgbiAKMDAwMDAwMDQ2MCAwMDAwMCBuIAowMDAwMDAwNTc1IDAwMDAwIG4gCjAwMDAwMDA3NzAgMDAwMDAgbiAKMDAwMDAwMDk2NSAwMDAwMCBuIAowMDAwMDAxMDM0IDAwMDAwIG4gCjAwMDAwMDEyOTUgMDAwMDAgbiAKMDAwMDAwMTM2MSAwMDAwMCBuIAowMDAwMDA1MjE1IDAwMDAwIG4gCnRyYWlsZXIKPDwKL0lEIApbPDI3NmNkYTk4ZTg2NjZlNzdkMTQ0YjdlMTc2Y2Y3YzZmPjwyNzZjZGE5OGU4NjY2ZTc3ZDE0NGI3ZTE3NmNmN2M2Zj5dCiUgUmVwb3J0TGFiIGdlbmVyYXRlZCBQREYgZG9jdW1lbnQgLS0gZGlnZXN0IChvcGVuc291cmNlKQoKL0luZm8gOSAwIFIKL1Jvb3QgOCAwIFIKL1NpemUgMTMKPj4Kc3RhcnR4cmVmCjgxNDkKJSVFT0YK";
@@ -5144,89 +5130,58 @@
           icon: "downloads",
           title: "Downloads",
           tag: "Every file in one place.",
-          sub: "Every Team Lead resource in one place. Tap a card to open it, then preview, print, grab the file, or copy a share link — zero digging through folders.",
+          sub: "Click any thumbnail to open the file inline. Print, download, or copy a share link right from the card — zero digging.",
           groups: [
             {
-              h: "Resources",
+              h: "Resource Library",
               body: [
                 FCARD(
                   "Team Lead Welcome Packet",
-                  "The first-week orientation packet every new Team Lead gets on day one.",
+                  "The complete first-week orientation packet every new Team Lead receives on day one.",
                   "WelcomePacket.pdf",
                   DL_FILLED,
                   "pdf",
-                  {
-                    cat: "Onboarding",
-                    detail: "12 pages",
-                    size: "1.4 MB",
-                    active: true,
-                    icon: "enrichment",
-                  },
+                  { dlId: "welcome", dlIcon: "enrichment" },
                 ),
                 FCARD(
-                  "Opening &amp; Closing Checklist",
-                  "The printable checklist Team Leads sign off at open and close.",
-                  "OpeningClosingChecklist.pdf",
+                  "Opening & Closing Checklist",
+                  "The printable checklist Team Leads sign off at open and close of every shift.",
+                  "OpenClosingChecklist.pdf",
                   DL_FILLED,
                   "pdf",
-                  {
-                    cat: "Daily",
-                    detail: "1 page",
-                    size: "88 KB",
-                    icon: "operations",
-                  },
+                  { dlId: "checklist", dlIcon: "operations" },
                 ),
                 FCARD(
                   "Weekly Schedule Template",
-                  "Blank weekly grid — drop names into shifts and print for the crew room.",
-                  "WeeklyScheduleTemplate.xlsx",
+                  "Blank weekly grid — drop in names and shift times, then print for the crew room.",
+                  "WeeklySchedule.pdf",
                   DL_FILLED,
-                  "xlsx",
-                  {
-                    cat: "Planning",
-                    detail: "Editable",
-                    size: "42 KB",
-                    icon: "workplans",
-                  },
+                  "pdf",
+                  { dlId: "schedule", dlIcon: "workplans" },
                 ),
                 FCARD(
                   "Crew Contact Roster",
                   "Names, roles, phone numbers, and shift preferences for the current crew.",
-                  "CrewContactRoster.pdf",
+                  "CrewRoster.pdf",
                   DL_FILLED,
                   "pdf",
-                  {
-                    cat: "People",
-                    detail: "Living doc",
-                    size: "210 KB",
-                    icon: "contact",
-                  },
+                  { dlId: "roster", dlIcon: "contact" },
                 ),
                 FCARD(
-                  "Filled Work Plan — Mr. Oliver",
-                  "The complete Monday–Friday week — use as a reference for your own plan.",
-                  "WorkPlan_MrOliver_FILLED.pdf",
+                  "Behavior Response Forms",
+                  "Structured forms for documenting behavior incidents and follow-up action plans.",
+                  "BehaviorForms.pdf",
                   DL_FILLED,
                   "pdf",
-                  {
-                    cat: "Work Plans",
-                    detail: "5 days",
-                    size: "1.1 MB",
-                    icon: "workplans",
-                  },
+                  { dlId: "response", dlIcon: "safety" },
                 ),
                 FCARD(
-                  "Blank Work Plan Template",
-                  "The empty form to fill in for your own week.",
-                  "Work_Plan_Template.docx",
-                  DL_BLANK,
-                  "docx",
-                  {
-                    cat: "Work Plans",
-                    detail: "Editable",
-                    size: "38 KB",
-                    icon: "forms",
-                  },
+                  "5-Day Work Plan Template",
+                  "Empty work plan — fill in Monday through Friday for your site week and print.",
+                  "WorkPlan_Template.pdf",
+                  DL_FILLED,
+                  "pdf",
+                  { dlId: "workplan", dlIcon: "forms" },
                 ),
               ],
             },
@@ -5557,64 +5512,58 @@
         }
         if (b.t === "fcard") {
           const isPdf = b.kind === "pdf";
-          const isXlsx = b.kind === "xlsx";
-          const typeLabel = isPdf ? "PDF" : isXlsx ? "XLSX" : "DOCX";
-          const iconKey = b.icon || (isPdf ? "workplans" : "forms");
-          const pid = "dlprev_" + b.filename.replace(/[^a-z0-9]/gi, "_");
-          const printBtn =
-            isPdf || isXlsx
-              ? '<button class="dlcard-act" title="Print" data-href="' +
-                b.href +
-                '" onclick="filePrint(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg></button>'
-              : '<div style="height:42px"></div>';
+          const typeLabel = isPdf ? "PDF" : b.kind === "xlsx" ? "XLSX" : "DOCX";
+          const dlId = b.dlId || ("fc_" + b.filename.replace(/[^a-z0-9]/gi, "_"));
+          const iconKey = b.dlIcon || (isPdf ? "forms" : "workplans");
+          const delay = (typeof _dlIdx === "number" ? _dlIdx : 0) * 72;
+          const SVG_EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+          const SVG_PRINT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>';
+          const SVG_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>';
+          const SVG_SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>';
+          const SVG_MAXIMIZE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+          const SVG_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
           return (
-            '<div class="dlcard' +
-            (b.active ? " dlcard-active" : "") +
-            '">' +
-            '<div class="dlcard-body">' +
-            '<div class="dlcard-icon">' +
-            ic(iconKey) +
-            "</div>" +
-            '<div class="dlcard-title">' +
-            b.label +
-            "</div>" +
-            '<div class="dlcard-meta">' +
-            (b.cat || "") +
-            (b.detail ? " · " + b.detail : "") +
-            "</div>" +
-            '<div class="dlcard-desc">' +
-            b.note +
-            "</div>" +
-            '<div class="dlcard-foot">' +
-            '<span class="dlcard-pill">' +
-            typeLabel +
-            "</span>" +
-            (b.size ? '<span class="dlcard-size">' + b.size + "</span>" : "") +
-            (b.active ? '<span class="dlcard-badge">ACTIVE</span>' : "") +
-            "</div>" +
-            "</div>" +
-            '<div class="dlcard-acts">' +
-            printBtn +
-            '<a class="dlcard-act dlcard-dl" href="' +
-            b.href +
-            '" download="' +
-            b.filename +
-            '" title="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg></a>' +
-            '<button class="dlcard-act" title="Preview" data-pid="' +
-            pid +
-            '" data-href="' +
-            b.href +
-            '" data-pdf="' +
-            isPdf +
-            '" onclick="dlPreview(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12S4.5 5 12 5s11 7 11 7-3.5 7-11 7S1 12 1 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>' +
-            '<button class="dlcard-act" title="Copy link" data-href="' +
-            b.href +
-            '" onclick="fileCopyLink(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg></button>' +
-            "</div>" +
-            "</div>" +
-            '<div class="dlcard-preview-panel" id="' +
-            pid +
-            '"></div>'
+            '<article class="dl-card" id="dl-' + dlId + '" style="animation-delay:' + delay + 'ms">' +
+              '<div class="dl-row">' +
+                '<div class="dl-body">' +
+                  '<div class="dl-info-row">' +
+                    '<span class="dl-icon-sq">' + ic(iconKey) + '</span>' +
+                    '<div class="dl-info-text">' +
+                      '<div class="dl-title">' + b.label + '</div>' +
+                      '<div class="dl-meta"><span class="dl-pill">' + typeLabel + '</span></div>' +
+                    '</div>' +
+                  '</div>' +
+                  '<button class="dl-thumb" onclick="dlToggle(\'' + dlId + '\')" aria-label="Preview ' + b.label + '">' +
+                    '<iframe class="dl-thumb-frame" src="' + b.href + '#toolbar=0&navpanes=0&scrollbar=0&view=FitH" tabindex="-1" title="' + b.label + '"></iframe>' +
+                    '<div class="dl-thumb-veil"></div>' +
+                    '<span class="dl-thumb-eye">' + SVG_EYE + '</span>' +
+                  '</button>' +
+                  '<div class="dl-desc">' + b.note + '</div>' +
+                '</div>' +
+                '<div class="dl-strip">' +
+                  '<button class="dl-act dl-act-eye" onclick="dlToggle(\'' + dlId + '\')" title="Preview">' + SVG_EYE + '</button>' +
+                  '<button class="dl-act" onclick="dlPrint(\'' + b.href + '\')" title="Print">' + SVG_PRINT + '</button>' +
+                  '<a class="dl-act dl-act-dl" href="' + b.href + '" download="' + b.filename + '" title="Download">' + SVG_DL + '</a>' +
+                  '<button class="dl-act" id="ds-' + dlId + '" onclick="dlShare(\'' + dlId + '\',\'' + b.href + '\')" title="Copy link">' + SVG_SHARE + '</button>' +
+                '</div>' +
+              '</div>' +
+              '<div class="dl-expand" id="dlx-' + dlId + '">' +
+                '<div class="dl-expand-inner">' +
+                  '<div class="dl-expand-body">' +
+                    '<div class="dl-expand-bar">' +
+                      '<span class="dl-expand-label">File Preview · ' + typeLabel + '</span>' +
+                      '<div class="dl-expand-acts">' +
+                        '<button class="dl-expand-btn" onclick="dlFullscreen(\'' + b.href + '\',\'' + b.label.replace(/'/g,"&#39;") + '\',\'' + typeLabel + '\')">' + SVG_MAXIMIZE + ' Fullscreen</button>' +
+                        '<button class="dl-expand-close" onclick="dlToggle(\'' + dlId + '\')">' + SVG_X + '</button>' +
+                      '</div>' +
+                    '</div>' +
+                    '<div class="dl-viewer-wrap">' +
+                      '<iframe class="dl-viewer-iframe" data-src="' + b.href + '" src="" title="' + b.label + '"></iframe>' +
+                    '</div>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+            '</article>'
           );
         }
         if (b.t === "contact") {
@@ -6074,31 +6023,31 @@
         );
       }
 
+      let dlOpenId = null;
+      let _dlIdx = 0;
+
       function buildSection(key) {
         const s = SECTIONS.find((x) => x.key === key);
         const idx = SECTIONS.indexOf(s);
         document.getElementById("secLabel").textContent =
-          s.key === "downloads"
-            ? "Resource Library"
-            : s.hidden
-              ? "Featured"
-              : "Section " + String(idx + 1).padStart(2, "0");
+          s.key === "downloads" ? "Resource Library" :
+          s.hidden ? "Featured" : "Section " + String(idx + 1).padStart(2, "0");
         document.getElementById("secTitle").textContent = s.title;
         document.getElementById("secSub").textContent = s.sub;
         const body = document.getElementById("secBody");
 
-        // Downloads: flat 2-column card grid, no accordion
+        // Downloads: flat 3-column card grid, no accordion
         if (s.key === "downloads") {
-          const allBlocks = s.groups.flatMap((g) => g.body);
+          dlOpenId = null;
+          const cards = s.groups.flatMap((g) => g.body.filter((x) => x && x.t === "fcard"));
           body.innerHTML =
-            '<div class="dlcard-grid">' +
-            allBlocks.map(buildBlock).join("") +
+            '<div class="dl-grid">' +
+            cards.map((b, i) => { _dlIdx = i; return buildBlock(b); }).join("") +
             "</div>";
           return;
         }
 
-        const isLinks =
-          s.key === "toolbox" || s.key === "contact" || s.key === "downloads";
+        const isLinks = s.key === "toolbox" || s.key === "contact";
         const groupsHtml = s.groups
           .map((g, gi) => {
             const hasFiles = g.body.some((x) => x && x.t === "fcard");
@@ -6395,34 +6344,84 @@
           const original = btn.innerHTML;
           btn.classList.add("done");
           btn.innerHTML =
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Copied';
           setTimeout(() => {
             btn.classList.remove("done");
             btn.innerHTML = original;
           }, 1800);
         });
       }
-      function dlPreview(btn) {
-        const pid = btn.dataset.pid;
-        const panel = document.getElementById(pid);
-        if (!panel) return;
-        const isOpen = panel.classList.contains("open");
-        if (isOpen) {
-          panel.classList.remove("open");
-          panel.innerHTML = "";
-          btn.style.color = "";
-          return;
+
+      /* ---------- downloads v2 functions ---------- */
+      function dlToggle(id) {
+        const prev = dlOpenId;
+        // Close previous
+        if (prev) {
+          const pc = document.getElementById("dl-" + prev);
+          const px = document.getElementById("dlx-" + prev);
+          if (pc) pc.classList.remove("is-open");
+          if (pc) pc.querySelector(".dl-act-eye") && pc.querySelector(".dl-act-eye").classList.remove("active");
+          if (px) {
+            px.classList.remove("open");
+            setTimeout(() => {
+              const fr = px.querySelector(".dl-viewer-iframe");
+              if (fr) fr.src = "";
+            }, 540);
+          }
         }
-        const isPdf = btn.dataset.pdf === "true";
-        panel.innerHTML = isPdf
-          ? '<iframe src="' +
-            btn.dataset.href +
-            '" title="File preview"></iframe>'
-          : '<div class="fprev-empty">Word docs can\'t preview inline — use Download to open in Word or Google Docs.</div>';
-        panel.classList.add("open");
-        btn.style.color = "var(--maroon)";
-        panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        if (prev === id) { dlOpenId = null; return; }
+        // Open new
+        const card = document.getElementById("dl-" + id);
+        const expand = document.getElementById("dlx-" + id);
+        if (!card || !expand) return;
+        card.classList.add("is-open");
+        const eye = card.querySelector(".dl-act-eye");
+        if (eye) eye.classList.add("active");
+        // Load iframe src lazily
+        const iframe = expand.querySelector(".dl-viewer-iframe");
+        if (iframe && !iframe.src && iframe.dataset.src) {
+          iframe.src = iframe.dataset.src + "#toolbar=1&view=FitH";
+        }
+        expand.classList.add("open");
+        dlOpenId = id;
+        setTimeout(() => card.scrollIntoView({ behavior: "smooth", block: "nearest" }), 80);
       }
+      function dlPrint(href) {
+        const w = window.open(href, "_blank");
+        if (!w) return;
+        const tryPrint = () => { try { w.focus(); w.print(); } catch(e) {} };
+        w.addEventListener("load", tryPrint);
+        setTimeout(tryPrint, 800);
+      }
+      function dlShare(id, href) {
+        navigator.clipboard.writeText(href).then(() => {
+          const btn = document.getElementById("ds-" + id);
+          if (!btn) return;
+          const orig = btn.innerHTML;
+          btn.classList.add("done");
+          btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+          setTimeout(() => { btn.classList.remove("done"); btn.innerHTML = orig; }, 1600);
+        });
+      }
+      function dlFullscreen(href, title, ext) {
+        const ov = document.getElementById("dlFs");
+        if (!ov) return;
+        document.getElementById("dlFsMeta").textContent = ext + " · File Preview";
+        document.getElementById("dlFsTitle").textContent = title;
+        document.getElementById("dlFsIframe").src = href + "#toolbar=1&view=FitH";
+        ov.classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+      function dlCloseFs() {
+        const ov = document.getElementById("dlFs");
+        if (!ov) return;
+        ov.classList.remove("open");
+        document.getElementById("dlFsIframe").src = "";
+        document.body.style.overflow = "";
+      }
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && document.getElementById("dlFs").classList.contains("open")) dlCloseFs();
+      });
 
       /* ---------- scroll reveal ---------- */
       const io = new IntersectionObserver(
